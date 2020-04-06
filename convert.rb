@@ -102,12 +102,20 @@ class Book
     "#{title}.epub"
   end
 
+  def filename_pdf
+    "#{title}.pdf"
+  end
+
   def styles
     File.join(CUR_DIR, 'epub.css')
   end
 
   def output
     File.join(OUT_DIR, branch, filename)
+  end
+
+  def output_pdf
+    File.join(OUT_DIR, branch, filename_pdf)
   end
 
   def files
@@ -157,7 +165,10 @@ class Book
     opts = options.merge(meta).map { |key, value| "#{key}='#{value}'" }.join(' ')
 
     FileUtils.chdir(path) do
+      puts("Executing command to generate epub: \npandoc #{opts} #{data}")
       system("pandoc #{opts} #{data}")
+      puts("Executing command to generate pdf from epub: \npandoc --toc --pdf-engine=xelatex --output='#{output_pdf}' '#{output}'")
+      system("pandoc --toc --pdf-engine=xelatex --output='#{output_pdf}' '#{output}'")
     end
   end
 end
